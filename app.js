@@ -33,8 +33,7 @@ var w = innerWidth,
 // -- settings
 var settings = {
   MAIN_BALL_RADIO: 210,
-  MAX_LINE_SIZE: 50,
-
+  MAX_LINE_SIZE: 100,
 };
 
 // -- model
@@ -62,18 +61,33 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
   svg = d3.select("body").append("svg:svg")
       .attr("width", w)
       .attr("height", h)
+      .attr("id", 'svg')
   lines = svg.append('svg:g')
     .attr("transform", "translate(" + w2 + "," +  h2 +" )")
 
   var year = 2000;
+
+  function updateYear(y){
+    document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
+    document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+    document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
+    document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
+    document.getElementById('big_year').innerHTML = y.toString();
+  }
+
   document.getElementById('prevBtn').onclick = function() {
-    year--; 
+    year--;
     show_year(year);
+    updateYear(year);
   }
   document.getElementById('nextBtn').onclick = function() {
     year++ ;
     show_year(year);
+    updateYear(year);
   }
+
+  document.getElementById('svg').style['position'] = 'absolute';
+  document.getElementById('svg').style['z-index'] = 1000;
 
   data.rows.sort(function(a, b) {
     return a.region < b.region;
@@ -97,6 +111,14 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
         allCountriesByISO[country.iso] = country;
   }
 
+  window.onresize = function(event) {
+    svg.attr("width", window.innerWidth);
+    svg.attr("height", window.innerHeight);
+    lines.attr("transform", "translate(" + window.innerWidth/2 + "," +  window.innerHeight/2 +" )");
+    document.getElementById('innerCircle').style.left = window.innerWidth/2;
+    document.getElementById('innerCircle').style.top = window.innerHeight/2;
+  }
+
   show_year(year);
 
 });
@@ -108,7 +130,7 @@ function show_year(year) {
         countryData[i] = {
           idx: i,
           iso: country.iso,
-          value: Math.pow(parseFloat(country.imports)/126993.0, 0.25),
+          value: Math.pow(parseFloat(country.imports)/126993.0, 0.17),
           links: [2, 33],
           name: "country " + i,
 

@@ -63,3 +63,16 @@ div#nextBtn a:hover{
 	font-family: 'MentoneSemiBold'; font-size: 11px; color: #898989;
 	background: url('../img/next_arrow.png')  no-repeat right bottom;
 }
+
+div#citation{
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	color: #333333;
+	font-family: Arial, Sans-serif;
+	font-size: 12px;
+}
+
+div#citation a{
+	color: #333333;	
+}
