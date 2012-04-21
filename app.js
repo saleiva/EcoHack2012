@@ -47,7 +47,7 @@ var allCountriesByISO = {};
 var c = 100;
 function angleFromIdx(i) {
   //return -Math.PI/7 + (i-1)*2*Math.PI/allCountries.length;
-  return -Math.PI/2 + (i-1)*2*Math.PI/allCountries.length;
+  return -Math.PI/1.995 + i*2*Math.PI/allCountries.length;
 }
 
 HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
@@ -67,6 +67,12 @@ svg = d3.select("body").append("svg:svg")
       .attr("width", w)
       .attr("height", h)
       .attr("id", 'svg')
+      .on('click', function() {
+
+        if (!(d3.event.target instanceof SVGLineElement)){
+          show_year(year);
+        }
+      })
 
 document.getElementById('prevBtn').onclick = function() {
   year--;
@@ -88,7 +94,7 @@ function updateYear(y){
 }
 
 
-var order_i = 0;
+var order_i = 1;
 document.getElementById('filterList').onclick = function(e) {
 
    var eee = e.target.getAttribute('href');
@@ -197,6 +203,7 @@ function loading(o) {
 
 function show_year(year) {
 
+  document.getElementById('big_year').innerHTML = year; 
   loading(false);
   removeAllLinks();
   d3.json(HOST + THE_ANDREW_SQL.format(year), function(data) {
@@ -299,7 +306,6 @@ function start(year) {
         fade(1, 500, d);
       })
       .on('click', function(sourceCountry) {
-          console.log("click");
           loading(false);
           restoreCountries();
           d3.json(HOST + COUNTRY_LINKS_URL.format(sourceCountry.iso, year), function(links) { 
