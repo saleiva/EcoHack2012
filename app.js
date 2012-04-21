@@ -51,9 +51,9 @@ HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
 
 THE_ANDREW_SQL = "SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values where year='{0}' GROUP%20BY%20iso";
 
-COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' and year = {1} GROUP BY iso, from_iso"
+COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' and year = {1} GROUP BY iso, from_iso";
 
-ALL_COUNTRIES = 'select%20iso,%20name,%20region%20FROM%20countries'
+ALL_COUNTRIES = 'select%20iso,%20name,%20region,flights,gdp,population,sp FROM%20countries';
 
 var svg, lines;
 
