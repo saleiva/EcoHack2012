@@ -1,0 +1,17 @@
+body{
+	background: #333333 url('../img/bkg.jpg') no-repeat center center fixed;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+#titleContainer{
+	position: absolute;
+	top: 60px;
+	left: 60px;
+	width: 350px;
+}
+
+h1{ font-family: 'MentoneSemiBold'; font-size: 31px; color: #FFF; margin: 0 0 20px 0;}
+h2{ font-family: Helvetica, Arial, Sans-serif; font-size: 15px; font-weight: normal; color: #707070; width: 300px; line-height:20px; background: url('../img/bullet.png')  0 4px no-repeat; padding: 0 0 0 10px;}

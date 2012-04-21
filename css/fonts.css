@@ -1,0 +1,12 @@
+
+@font-face {
+    font-family: 'MentoneSemiBold';
+    src: url('fonts/mentone-semibol-webfont.eot');
+    src: url('fonts/mentone-semibol-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/mentone-semibol-webfont.woff') format('woff'),
+         url('fonts/mentone-semibol-webfont.ttf') format('truetype'),
+         url('fonts/mentone-semibol-webfont.svg#MentoneSemiBold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
