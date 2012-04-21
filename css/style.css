@@ -78,6 +78,7 @@ div#citation a{
 }
 
 #tooltip {
-color: #FFF;
-font-size: 12px;
+	color: #FFF;
+	font-size: 13px;
+	font-family: Arial, Sans-serif;
 }

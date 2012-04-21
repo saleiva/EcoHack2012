@@ -213,8 +213,8 @@ function start(year) {
         tooltip.style.position = 'absolute';
         tooltip.style['z-index'] = '20000';
         tooltip.innerHTML = d.name;
-        tooltip.style.left = d3.event.clientX+"px";
-        tooltip.style.top = d3.event.clientY+ 'px';
+        tooltip.style.left = d3.event.clientX+10+'px';
+        tooltip.style.top = d3.event.clientY+10+'px';
         fade(.2, 50, d);
       })
       .on("mouseout", function(d) {
