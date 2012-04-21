@@ -53,6 +53,7 @@ function angleFromIdx(i) {
 HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
 
 THE_ANDREW_SQL = "SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values where year='{0}' GROUP%20BY%20iso";
+THE_ANDREW_SQL_LOVE = "SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values GROUP%20BY%20iso";
 
 COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' and year = {1} GROUP BY iso, from_iso";
 
@@ -87,10 +88,10 @@ document.getElementById('nextBtn').onclick = function() {
 
 function updateYear(y){
   document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
-  document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+  document.getElementById('nextBtn_a').style.display = (y<2009) ? 'inline' : 'none';
   document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
   document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
-  document.getElementById('big_year').innerHTML = y.toString();
+  document.getElementById('big_year').innerHTML = year == 2009?"all years":y.toString();
 }
 
 
@@ -202,11 +203,15 @@ function loading(o) {
 
 
 function show_year(year) {
-
-  document.getElementById('big_year').innerHTML = year; 
+  document.getElementById('big_year').innerHTML = year == 2009?"all years":year.toString();
   loading(false);
   removeAllLinks();
-  d3.json(HOST + THE_ANDREW_SQL.format(year), function(data) {
+  var sql = HOST + THE_ANDREW_SQL.format(year);
+  if(year == 2009) {
+    var sql = HOST + THE_ANDREW_SQL_LOVE;
+  }
+
+  d3.json(sql , function(data) {
       loading(true);
       for(var i = 0; i < data.rows.length; ++i) {
         country = data.rows[i]
