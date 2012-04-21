@@ -33,76 +33,94 @@ var w = innerWidth,
 // -- settings
 var settings = {
   MAIN_BALL_RADIO: 200,
-  MAX_LINE_SIZE: 50,
+  MAX_LINE_SIZE: 100,
 
 };
 
 // -- model
 var countryData = [];
 var countryDataByIso = [];
+var allCountries = [];
+
 var c = 100;
 function angleFromIdx(i) {
-  return i*2*Math.PI/countryData.length;
+  return i*2*Math.PI/allCountries.length;
 }
 
 HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
 
-THE_ANDREW_SQL = 'SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values%20GROUP%20BY%20iso'
+THE_ANDREW_SQL = "SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values where year='{0}' GROUP%20BY%20iso";
 
 COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' GROUP BY iso, from_iso"
 
-d3.json(HOST + THE_ANDREW_SQL, function(data) {
-    for(var i = 0; i < data.rows.length; ++i) {
-      country = data.rows[i]
-      countryData[i] = {
-        idx: i,
-        iso: country.iso,
-        value: Math.pow(parseFloat(country.imports)/226993.0, 0.25),
-        links: [2, 33],
-        name: "country " + i,
-        position: function() {
-           return {
-                x: settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
-                y: settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
-           }
-        },
-        angle: function() {
-            return angleFromIdx(this.idx);
-        }
+ALL_COUNTRIES = 'select%20iso,%20name,%20region%20FROM%20countries'
 
-      }
-      countryDataByIso[country.iso] = countryData[i];
-    }
+var svg, lines;
 
-    start();
-  
+d3.json(HOST + ALL_COUNTRIES , function(data) {
+  svg = d3.select("body").append("svg:svg")
+      .attr("width", w)
+      .attr("height", h)
+  lines = svg.append('svg:g')
+    .attr("transform", "translate(" + w2 + "," +  h2 +" )")
+
+  var year = 2000;
+  document.getElementById('prevBtn').onclick = function() {
+    year--; 
+    show_year(year);
+  }
+  document.getElementById('nextBtn').onclick = function() {
+    year++ ;
+    show_year(year);
+  }
+
+  data.rows.sort(function(a, b) {
+    return a.region < b.region;
+  });
+  for(var i = 0; i < data.rows.length; ++i) {
+        country = data.rows[i]
+        country.idx = i;
+        allCountries[i] = country;
+  }
+
+  show_year(year);
+
 });
+
+function show_year(year) {
+  d3.json(HOST + THE_ANDREW_SQL.format(year), function(data) {
+      for(var i = 0; i < data.rows.length; ++i) {
+        country = data.rows[i]
+        countryData[i] = {
+          idx: i,
+          iso: country.iso,
+          value: Math.pow(parseFloat(country.imports)/126993.0, 0.25),
+          links: [2, 33],
+          name: "country " + i,
+          position: function() {
+             return {
+                  x: settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
+                  y: settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
+             }
+          },
+          angle: function() {
+              return angleFromIdx(this.idx);
+          }
+
+        }
+        countryDataByIso[country.iso] = countryData[i];
+      }
+
+      start();
+    
+  });
+};
 
 
 function start() {
 
-  var svg = d3.select("body").append("svg:svg")
-      .attr("width", w)
-      .attr("height", h)
-
-  // main circle
-      /*
-  svg.append("svg:circle")
-      .attr('r', settings.MAIN_BALL_RADIO)
-      .attr('cx',300)
-      .attr('cy', 300)
-      .style("fill", '#FFF')//z(++i))
-      .style("fill-opacity", 1)
-      */
-
-  // links between countries
-
-  // lines
-  var lines = svg.append('svg:g')
-    .attr("transform", "translate(" + w2 + "," +  h2 +" )")
-
   lines.selectAll("line.country")
-    .data(countryData, function(d) {
+    .data(allCountries, function(d) {
       return d.iso;
     })
     .enter()
@@ -118,28 +136,29 @@ function start() {
           return settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(d.idx));
       })
       .attr('x2', function(d) {
-          return (settings.MAIN_BALL_RADIO + d.value*settings.MAX_LINE_SIZE)*Math.cos(angleFromIdx(d.idx));
+          var c = countryDataByIso[d.iso];
+          var v = 0;
+          if (c) {
+            v = c.value;
+          }
+          return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.cos(angleFromIdx(d.idx));
       })
       .attr('y2', function(d) {
-          return (settings.MAIN_BALL_RADIO + d.value*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
+          var c = countryDataByIso[d.iso];
+          var v = 0;
+          if (c) {
+            v = c.value;
+          }
+          return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
       })
       .attr('stroke', function(d) {
-          //South: #FFFF66
-          //north: #0099CC
-          //Tropical #669933
-          if(d.idx < 100) {
+          if(d.region == 'south') {
             return '#FFFF66';
-          }
-          if (d.idx > 150) {
-           return '#669933';
+          } 
+          if (d.region == 'north') {
+            return '#669933';
           }
           return '#0099CC';
-      })
-      .attr('fill', function(d) {
-          if(d.idx > 100) {
-            return '#FFF';
-          }
-          return '#F00';
       })
       .attr('stroke-width', 4.2)
       .on('click', function(sourceCountry) {
@@ -183,5 +202,25 @@ function start() {
 
 
       });
+
+      lines.selectAll("line.country")
+        .data(allCountries)
+        .transition()
+          .attr('x2', function(d) {
+              var c = countryDataByIso[d.iso];
+              var v = 0;
+              if (c) {
+                v = c.value;
+              }
+              return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.cos(angleFromIdx(d.idx));
+          })
+          .attr('y2', function(d) {
+              var c = countryDataByIso[d.iso];
+              var v = 0;
+              if (c) {
+                v = c.value;
+              }
+              return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
+          })
     }
 
