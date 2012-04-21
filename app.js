@@ -33,8 +33,7 @@ var w = innerWidth,
 // -- settings
 var settings = {
   MAIN_BALL_RADIO: 210,
-  MAX_LINE_SIZE: 50,
-
+  MAX_LINE_SIZE: 130,
 };
 
 // -- model
@@ -65,13 +64,25 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
     .attr("transform", "translate(" + w2 + "," +  h2 +" )")
 
   var year = 2000;
+
+  function updateYear(y){
+
+    document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
+    document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+    document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
+    document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
+    document.getElementById('big_year').innerHTML = y.toString();
+  }
+
   document.getElementById('prevBtn').onclick = function() {
-    year--; 
+    year--;
     show_year(year);
+    updateYear(year);
   }
   document.getElementById('nextBtn').onclick = function() {
     year++ ;
     show_year(year);
+    updateYear(year);
   }
 
   data.rows.sort(function(a, b) {
@@ -81,6 +92,13 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
         country = data.rows[i]
         country.idx = i;
         allCountries[i] = country;
+  }
+
+  window.onresize = function(event) {
+    console.log(window.innerWidth);
+    lines.attr("transform", "translate(" + window.innerWidth/2 + "," +  window.innerHeight/2 +" )");
+    document.getElementById('innerCircle').style.left = window.innerWidth/2;
+    document.getElementById('innerCircle').style.top = window.innerHeight/2;
   }
 
   show_year(year);
