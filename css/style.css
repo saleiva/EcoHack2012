@@ -76,3 +76,8 @@ div#citation{
 div#citation a{
 	color: #333333;	
 }
+
+#tooltip {
+color: #FFF;
+font-size: 12px;
+}

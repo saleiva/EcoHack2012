@@ -56,6 +56,7 @@ COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE 
 ALL_COUNTRIES = 'select%20iso,%20name,%20region%20FROM%20countries'
 
 var svg, lines;
+var tooltip;
 
 d3.json(HOST + ALL_COUNTRIES , function(data) {
   svg = d3.select("body").append("svg:svg")
@@ -64,6 +65,8 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
       .attr("id", 'svg')
   lines = svg.append('svg:g')
     .attr("transform", "translate(" + w2 + "," +  h2 +" )")
+
+  tooltip = document.getElementById('tooltip');
 
   var year = 2000;
 
@@ -144,16 +147,14 @@ function show_year(year) {
   });
 };
 
-function fade(opacity, ttt) {
-   return function(t) {
-     lines.selectAll("line.country")
-         .filter(function(d) {
-           return d.iso != t.iso;
-         })
-       .transition()
-       .duration(ttt)
-        .style("opacity", opacity);
-   };
+function fade(opacity, ttt, t) {
+   lines.selectAll("line.country")
+       .filter(function(d) {
+         return d.iso != t.iso;
+       })
+     .transition()
+     .duration(ttt)
+      .style("opacity", opacity);
 }
 
 function removeAllLinks() {
@@ -206,9 +207,20 @@ function start(year) {
       .attr('stroke', function(d) {
         return colorByRegion(d.region); 
       })
-      .attr('stroke-width', 4.2)
-      .on("mouseover", fade(.2, 50))
-      .on("mouseout", fade(1, 500))
+      .attr('stroke-width', 5)
+      .on("mouseover", function(d, e) {
+        tooltip.style.display = 'block';
+        tooltip.style.position = 'absolute';
+        tooltip.style['z-index'] = '20000';
+        tooltip.innerHTML = d.name;
+        tooltip.style.left = d3.event.clientX+"px";
+        tooltip.style.top = d3.event.clientY+ 'px';
+        fade(.2, 50, d);
+      })
+      .on("mouseout", function(d) {
+        tooltip.style.display = 'none';
+        fade(1, 500, d);
+      })
       .on('click', function(sourceCountry) {
           console.log("click");
           restoreCountries();
