@@ -33,7 +33,7 @@ var w = innerWidth,
 // -- settings
 var settings = {
   MAIN_BALL_RADIO: 210,
-  MAX_LINE_SIZE: 130,
+  MAX_LINE_SIZE: 100,
 };
 
 // -- model
@@ -97,6 +97,8 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
   window.onresize = function(event) {
     console.log(window.innerWidth);
     lines.attr("transform", "translate(" + window.innerWidth/2 + "," +  window.innerHeight/2 +" )");
+    svg.attr("width", window.innerWidth);
+    svg.attr("height", window.innerHeight);
     document.getElementById('innerCircle').style.left = window.innerWidth/2;
     document.getElementById('innerCircle').style.top = window.innerHeight/2;
   }
@@ -112,7 +114,7 @@ function show_year(year) {
         countryData[i] = {
           idx: i,
           iso: country.iso,
-          value: Math.pow(parseFloat(country.imports)/126993.0, 0.25),
+          value: Math.pow(parseFloat(country.imports)/126993.0, 0.20),
           links: [2, 33],
           name: "country " + i,
           position: function() {
