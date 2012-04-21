@@ -124,6 +124,7 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
 });
 
 function show_year(year) {
+  removeAllLinks();
   d3.json(HOST + THE_ANDREW_SQL.format(year), function(data) {
       for(var i = 0; i < data.rows.length; ++i) {
         country = data.rows[i]
@@ -143,17 +144,31 @@ function show_year(year) {
   });
 };
 
-function fade(opacity) {
+function fade(opacity, ttt) {
    return function(t) {
      lines.selectAll("line.country")
          .filter(function(d) {
            return d.iso != t.iso;
          })
        .transition()
-         .style("opacity", opacity);
+       .duration(ttt)
+        .style("opacity", opacity);
    };
 }
 
+function removeAllLinks() {
+    lines.selectAll('path.link').remove()
+}
+
+function colorByRegion(r) {
+    if(r == 'south') {
+      return '#FFFF66';
+    } 
+    if (r == 'north') {
+      return '#669933';
+    }
+    return '#0099CC';
+}
 function start(year) {
 
   lines.selectAll("line.country")
@@ -189,17 +204,11 @@ function start(year) {
           return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
       })
       .attr('stroke', function(d) {
-          if(d.region == 'south') {
-            return '#FFFF66';
-          } 
-          if (d.region == 'north') {
-            return '#669933';
-          }
-          return '#0099CC';
+        return colorByRegion(d.region); 
       })
       .attr('stroke-width', 4.2)
-      .on("mouseover", fade(.1))
-      .on("mouseout", fade(1))
+      .on("mouseover", fade(.2, 50))
+      .on("mouseout", fade(1, 500))
       .on('click', function(sourceCountry) {
           console.log("click");
           restoreCountries();
@@ -214,6 +223,7 @@ function start(year) {
 
             lines.selectAll('line.country')
               .filter(function(d, i) {
+                if(d.iso == sourceCountry.iso) return false;
                 for(var l = 0; l < links.length; ++l) {
                   if(d.iso == links[l].from_iso) {
                     return true;
@@ -223,13 +233,11 @@ function start(year) {
               })
               .transition()
                 .attr('x2', function(d) {
-                    var f = 1.0 - 0.1*(linksByIso[d.iso]/max_sum);
-                    f = Math.max(0.9, f);
+                    var f = 1.0 - 0.2*(Math.sqrt(linksByIso[d.iso]/max_sum));
                     return f*(settings.MAIN_BALL_RADIO)*Math.cos(angleFromIdx(d.idx));
                 })
                 .attr('y2', function(d) {
-                    var f = 1.0 - 0.1*(linksByIso[d.iso]/max_sum);
-                    f = Math.max(0.9, f);
+                    var f = 1.0 - 0.2*(Math.sqrt(linksByIso[d.iso]/max_sum));
                     return f*(settings.MAIN_BALL_RADIO)*Math.sin(angleFromIdx(d.idx));
                 })
 
@@ -243,19 +251,22 @@ function start(year) {
                 .attr('class', 'link')
                 .attr("d", function(d) {
                   var op = sourceCountry.position()
-                  var f = 1.0 - 0.1*(d.sum/max_sum);
-                  var tp = allCountriesByISO[d.from_iso].position(f*0.97);
+                  var f = 1.0 - 0.2*Math.sqrt(d.sum/max_sum);
+                  var tp = allCountriesByISO[d.from_iso].position(f*0.98);
                   var s = "M " + op.x + "," + op.y;
                   var e = "C 0,0 0,0 " + tp.x +"," + tp.y;
                   return s + " " + e; //'M 0,420 C 110,220 220,145 0,0'
                 })
                 .attr('fill', 'none')
-                .attr('stroke', '#FFF')
+                .attr('stroke', function(d) {
+                  var t = allCountriesByISO[d.from_iso];
+                  return colorByRegion(t.region); 
+                })
                 .attr('stroke-width', function(d) {
                   return 0.2 + 1.4*d.sum/max_sum;
                 })
                 .attr('opacity', function(d) {
-                  return 0.1 + 0.5*d.sum/max_sum;
+                  return 0.3 + 0.5*d.sum/max_sum;
                 });
           });
 
@@ -283,5 +294,6 @@ function start(year) {
                 return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
             })
       }
+      restoreCountries();
     }
 
