@@ -60,85 +60,100 @@ ALL_COUNTRIES = 'select%20iso,%20name,%20region,flights,gdp,population,sp FROM%2
 var svg, lines;
 var tooltip;
 
-loading(false);
 
 svg = d3.select("body").append("svg:svg")
       .attr("width", w)
       .attr("height", h)
       .attr("id", 'svg')
 
-d3.json(HOST + ALL_COUNTRIES , function(data) {
-  loading(true);
-  lines = svg.append('svg:g')
-    .attr("transform", "translate(" + w2 + "," +  h2 +" )")
-
-  tooltip = document.getElementById('tooltip');
-
-  var year = 2000;
-
-  var order_by = ['region', 'gdp','sp','population','flights'];
-  var order_i = 0;
-  
-  function updateYear(y){
-    document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
-    document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
-    document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
-    document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
-    document.getElementById('big_year').innerHTML = y.toString();
-  }
-
-  document.getElementById('prevBtn').onclick = function() {
-    year--;
-    show_year(year);
-    updateYear(year);
-  }
-  document.getElementById('nextBtn').onclick = function() {
-    year++ ;
-    show_year(year);
-    updateYear(year);
-  }
-  
-  // document.getElementById('orderBtn').onclick = function() {
-  //   console.log(order_i);
-  //   order_i =  order_i<order_by.length-1 ? order_i+1 : 0;
-  // }
-
-  document.getElementById('svg').style['position'] = 'absolute';
-  document.getElementById('svg').style['z-index'] = 1000;
-
-  data.rows.sort(function(a, b) {
-    return a[order_by[order_i]] < b[order_by[order_i]];
-  });
-  for(var i = 0; i < data.rows.length; ++i) {
-        country = data.rows[i]
-        country.idx = i;
-        country.position = function(f) {
-            if (f === undefined) f = 1
-             return {
-                  x: f*settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
-                  y: f*settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
-             }
-        }
-
-        country.angle = function() {
-              return angleFromIdx(this.idx);
-        }
-
-        allCountries[i] = country;
-        allCountriesByISO[country.iso] = country;
-  }
-
-  window.onresize = function(event) {
-    svg.attr("width", window.innerWidth);
-    svg.attr("height", window.innerHeight);
-    lines.attr("transform", "translate(" + window.innerWidth/2 + "," +  window.innerHeight/2 +" )");
-    document.getElementById('innerCircle').style.left = window.innerWidth/2;
-    document.getElementById('innerCircle').style.top = window.innerHeight/2;
-  }
-
+document.getElementById('prevBtn').onclick = function() {
+  year--;
   show_year(year);
+  updateYear(year);
+}
+document.getElementById('nextBtn').onclick = function() {
+  year++ ;
+  show_year(year);
+  updateYear(year);
+}
 
-});
+document.getElementById('filterList').onclick = function(e) {
+   order_i = parseInt(e.target.getAttribute('href').slice(1), 10);
+   console.log(order_i);
+   restart();
+} 
+
+function restart() {
+  loading(false);
+
+  d3.json(HOST + ALL_COUNTRIES , function(data) {
+    loading(true);
+    svg.selectAll("g").remove();
+    lines = svg.append('svg:g')
+      .attr("transform", "translate(" + w2 + "," +  h2 +" )")
+
+    tooltip = document.getElementById('tooltip');
+
+    var year = 2000;
+
+    var order_by = ['region', 'gdp','sp','population','flights'];
+    var order_i = 0;
+    
+    function updateYear(y){
+      document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
+      document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+      document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
+      document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
+      document.getElementById('big_year').innerHTML = y.toString();
+    }
+
+    
+    // document.getElementById('orderBtn').onclick = function() {
+    //   console.log(order_i);
+    //   order_i =  order_i<order_by.length-1 ? order_i+1 : 0;
+    // }
+
+    document.getElementById('svg').style['position'] = 'absolute';
+    document.getElementById('svg').style['z-index'] = 1000;
+
+    var rows = data.rows.sort(function(a, b) {
+      var f = order_by[order_i]
+      return a[f] - b[f];
+    });
+
+    for(var i = 0; i < rows.length; ++i) {
+          country = rows[i]
+          country.idx = i;
+          country.position = function(f) {
+              if (f === undefined) f = 1
+               return {
+                    x: f*settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
+                    y: f*settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
+               }
+          }
+
+          country.angle = function() {
+                return angleFromIdx(this.idx);
+          }
+
+          allCountries[i] = country;
+          allCountriesByISO[country.iso] = country;
+    }
+
+    window.onresize = function(event) {
+      svg.attr("width", window.innerWidth);
+      svg.attr("height", window.innerHeight);
+      lines.attr("transform", "translate(" + window.innerWidth/2 + "," +  window.innerHeight/2 +" )");
+      document.getElementById('innerCircle').style.left = window.innerWidth/2;
+      document.getElementById('innerCircle').style.top = window.innerHeight/2;
+    }
+
+    show_year(year);
+
+  });
+}
+
+restart();
 
 function loading(o) {
   if(o) {
