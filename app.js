@@ -32,7 +32,7 @@ var w = innerWidth,
 
 // -- settings
 var settings = {
-  MAIN_BALL_RADIO: 200,
+  MAIN_BALL_RADIO: 210,
   MAX_LINE_SIZE: 50,
 
 };

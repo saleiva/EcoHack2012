@@ -7,12 +7,12 @@ h2{ font-family: Helvetica, Arial, Sans-serif; font-size: 15px; font-weight: nor
 
 div#innerCircle{
 	position: absolute;
-	width: 400px;
-	height: 400px;
+	width: 402px;
+	height: 402px;
 	display: block;
 	top: 50%;
 	left: 50%;
-	margin: -200px 0 0 -200px;
+	margin: -201px 0 0 -201px;
 	background: url('../img/inner_circle.png') no-repeat right top;
 	text-align: center;
 }
