@@ -46,7 +46,8 @@ var allCountriesByISO = {};
 
 var c = 100;
 function angleFromIdx(i) {
-  return i*2*Math.PI/allCountries.length;
+  //return -Math.PI/7 + (i-1)*2*Math.PI/allCountries.length;
+  return -Math.PI/2 + (i-1)*2*Math.PI/allCountries.length;
 }
 
 HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
@@ -59,6 +60,7 @@ ALL_COUNTRIES = 'select%20iso,%20name,%20region,flights,gdp,population,sp FROM%2
 
 var svg, lines;
 var tooltip;
+var year = 2000;
 
 
 svg = d3.select("body").append("svg:svg")
@@ -77,10 +79,28 @@ document.getElementById('nextBtn').onclick = function() {
   updateYear(year);
 }
 
+function updateYear(y){
+  document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
+  document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+  document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
+  document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
+  document.getElementById('big_year').innerHTML = y.toString();
+}
+
+
+var order_i = 0;
 document.getElementById('filterList').onclick = function(e) {
+
+   var eee = e.target.getAttribute('href');
+   if(!eee) return;
    order_i = parseInt(e.target.getAttribute('href').slice(1), 10);
    console.log(order_i);
    restart();
+   var c = document.getElementById('filterList').children;
+   for(var i = 0; i < c.length; ++i) {
+     c[i].children[0].setAttribute('class', '');
+   }
+   e.target.setAttribute('class', 'selected');
 } 
 
 function restart() {
@@ -94,19 +114,9 @@ function restart() {
 
     tooltip = document.getElementById('tooltip');
 
-    var year = 2000;
 
     var order_by = ['region', 'gdp','sp','population','flights'];
-    var order_i = 0;
     
-    function updateYear(y){
-      document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
-      document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
-      document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
-      document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
-      document.getElementById('big_year').innerHTML = y.toString();
-    }
-
     
     // document.getElementById('orderBtn').onclick = function() {
     //   console.log(order_i);
@@ -116,9 +126,13 @@ function restart() {
     document.getElementById('svg').style['position'] = 'absolute';
     document.getElementById('svg').style['z-index'] = 1000;
 
+      function strcmp(a, b)
+      {   
+          return (a<b?-1:(a>b?1:0));  
+      }
     var rows = data.rows.sort(function(a, b) {
       var f = order_by[order_i]
-      return a[f] - b[f];
+      return strcmp(b[f], a[f]);
     });
 
     for(var i = 0; i < rows.length; ++i) {
