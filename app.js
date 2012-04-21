@@ -216,6 +216,7 @@ function start(year) {
         tooltip.style.left = d3.event.clientX+10+'px';
         tooltip.style.top = d3.event.clientY+10+'px';
         fade(.2, 50, d);
+        this.style['cursor'] = 'pointer';
       })
       .on("mouseout", function(d) {
         tooltip.style.display = 'none';
@@ -230,7 +231,6 @@ function start(year) {
             var linksByIso = {};
             for(var i = 0; i < links.length; ++i) {
               linksByIso[links[i].from_iso] = links[i].sum;
-
             }
 
             lines.selectAll('line.country')
