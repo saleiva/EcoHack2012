@@ -37,8 +37,8 @@ div#innerCircle ul li.north{ background: url('../img/legend_blue.png') 0 5px no-
 div#innerCircle ul li.tropical{ background: url('../img/legend_green.png') 0 5px no-repeat;}
 div#innerCircle ul li.south{ background: url('../img/legend_yellow.png') 0 5px no-repeat;}
 
-div#prevBtn{ position: absolute; top: 50%; left: 60px;}
-div#nextBtn{ position: absolute; top: 50%; right: 60px;}
+div#prevBtn{ position: absolute; top: 50%; left: 60px; z-index: 1001;}
+div#nextBtn{ position: absolute; top: 50%; right: 60px; z-index: 1001;}
 
 div#prevBtn a{
 	font-family: 'MentoneSemiBold'; font-size: 11px; color: #4e4e4e;
