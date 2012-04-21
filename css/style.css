@@ -6,7 +6,7 @@ body{
 	background-size: cover;
 }
 
-#titleContainer{
+div#titleContainer{
 	position: absolute;
 	top: 60px;
 	left: 60px;
@@ -15,3 +15,39 @@ body{
 
 h1{ font-family: 'MentoneSemiBold'; font-size: 31px; color: #FFF; margin: 0 0 20px 0;}
 h2{ font-family: Helvetica, Arial, Sans-serif; font-size: 15px; font-weight: normal; color: #707070; width: 300px; line-height:20px; background: url('../img/bullet.png')  0 4px no-repeat; padding: 0 0 0 10px;}
+
+div#prevBtn{
+	position: absolute;
+	top: 50%;
+	left: 60px;
+}
+
+div#nextBtn{
+	position: absolute;
+	top: 50%;
+	right: 60px;
+}
+
+div#prevBtn a{
+	font-family: 'MentoneSemiBold'; font-size: 11px; color: #4e4e4e;
+	padding: 26px 0 25px 76px;
+	background: url('../img/prev_arrow.png') no-repeat top left;
+	text-decoration: none;
+}
+
+div#prevBtn a:hover{
+	font-family: 'MentoneSemiBold'; font-size: 11px; color: #898989;
+	background: url('../img/prev_arrow.png') no-repeat bottom left;
+}
+
+div#nextBtn a{
+	font-family: 'MentoneSemiBold'; font-size: 11px; color: #4e4e4e;
+	padding: 26px 76px 25px 0px;
+	background: url('../img/next_arrow.png') no-repeat right top;
+	text-decoration: none;
+}
+
+div#nextBtn a:hover{
+	font-family: 'MentoneSemiBold'; font-size: 11px; color: #898989;
+	background: url('../img/next_arrow.png')  no-repeat right bottom;
+}
