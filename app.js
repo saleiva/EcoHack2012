@@ -228,9 +228,9 @@ function colorByRegion(r) {
       return '#FFFF66';
     } 
     if (r == 'north') {
-      return '#669933';
+      return '#0099CC';
     }
-    return '#0099CC';
+    return '#669933';
 }
 function start(year) {
 
@@ -289,6 +289,7 @@ function start(year) {
           loading(false);
           restoreCountries();
           d3.json(HOST + COUNTRY_LINKS_URL.format(sourceCountry.iso, year), function(links) { 
+            document.getElementById('big_year').innerHTML = sourceCountry.name
             links = links.rows;
             loading(true);
             var max_sum = d3.max(links, function(a) { return a.sum});
