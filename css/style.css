@@ -91,10 +91,21 @@ div#citation{
 	bottom: 10px;
 	color: #333333;
 	font-family: Arial, Sans-serif;
-	font-size: 12px;
+	font-size: 11px;
+	z-index: 2001;
 }
 
-div#citation a{
+div#credits{
+	position: absolute;
+	left: 10px;
+	bottom: 10px;
+	color: #333333;
+	font-family: Arial, Sans-serif;
+	font-size: 11px;
+	z-index: 2000;
+}
+
+div#citation a, div#credits a{
 	color: #333333;	
 }
 
