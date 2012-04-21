@@ -1,9 +1,30 @@
 body{ background: #333333 url('../img/bkg.jpg') no-repeat center center fixed; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover; }
 
-div#titleContainer{ position: absolute; top: 60px; left: 60px; width: 350px; }
+div#titleContainer{ position: absolute; top: 60px; left: 50px; width: 350px; z-index: 1002; }
 
-h1{ font-family: 'MentoneSemiBold'; font-size: 31px; color: #FFF; margin: 0 0 20px 0;}
-h2{ font-family: Helvetica, Arial, Sans-serif; font-size: 15px; font-weight: normal; color: #707070; width: 300px; line-height:20px; background: url('../img/bullet.png')  0 4px no-repeat; padding: 0 0 0 12px;}
+h1{ font-family: 'MentoneSemiBold'; font-size: 31px; color: #FFF; margin: 0 0 20px 11px;}
+h2{ font-family: Helvetica, Arial, Sans-serif; font-size: 15px; font-weight: normal; color: #707070; width: 300px; line-height:20px; margin: 0 0 0 11px;}
+
+div#titleContainer ul{ margin: 20px 0 0 0;}
+
+div#titleContainer ul li{
+	font-family: Arial, Sans-serif;
+	font-size: 15px;
+	margin: 7px 0 0 0;
+}
+
+div#titleContainer ul li a{
+	color: #707070;
+	text-decoration: none;
+	padding: 0 0 0 11px;
+}
+
+div#titleContainer ul li a:hover{ color: #FFF; }
+
+div#titleContainer ul li a.selected{
+	color:#FFF;
+	background: url('../img/menu_bullet.png') 1px 6px no-repeat;
+}
 
 div#innerCircle{
 	position: absolute;
