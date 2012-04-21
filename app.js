@@ -174,9 +174,9 @@ function colorByRegion(r) {
       return '#FFFF66';
     } 
     if (r == 'north') {
-      return '#669933';
+      return '#0099CC';
     }
-    return '#0099CC';
+    return '#669933';
 }
 function start(year) {
 
