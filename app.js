@@ -41,6 +41,7 @@ var settings = {
 var countryData = [];
 var countryDataByIso = [];
 var allCountries = [];
+var allCountriesByISO = {};
 
 var c = 100;
 function angleFromIdx(i) {
@@ -51,7 +52,7 @@ HOST = 'https://ecohack12.cartodb.com/api/v2/sql?q='
 
 THE_ANDREW_SQL = "SELECT%20iso,%20sum(imports)%20as%20imports%20FROM%20circle_values where year='{0}' GROUP%20BY%20iso";
 
-COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' GROUP BY iso, from_iso"
+COUNTRY_LINKS_URL = "SELECT iso, from_iso, sum(quantity) FROM connections WHERE iso='{0}' and year = {1} GROUP BY iso, from_iso"
 
 ALL_COUNTRIES = 'select%20iso,%20name,%20region%20FROM%20countries'
 
@@ -80,7 +81,20 @@ d3.json(HOST + ALL_COUNTRIES , function(data) {
   for(var i = 0; i < data.rows.length; ++i) {
         country = data.rows[i]
         country.idx = i;
+        country.position = function(f) {
+            if (f === undefined) f = 1
+             return {
+                  x: f*settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
+                  y: f*settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
+             }
+        }
+
+        country.angle = function() {
+              return angleFromIdx(this.idx);
+        }
+
         allCountries[i] = country;
+        allCountriesByISO[country.iso] = country;
   }
 
   show_year(year);
@@ -97,27 +111,28 @@ function show_year(year) {
           value: Math.pow(parseFloat(country.imports)/126993.0, 0.25),
           links: [2, 33],
           name: "country " + i,
-          position: function() {
-             return {
-                  x: settings.MAIN_BALL_RADIO*Math.cos(angleFromIdx(this.idx)),
-                  y: settings.MAIN_BALL_RADIO*Math.sin(angleFromIdx(this.idx))
-             }
-          },
-          angle: function() {
-              return angleFromIdx(this.idx);
-          }
 
         }
         countryDataByIso[country.iso] = countryData[i];
       }
 
-      start();
+      start(year);
     
   });
 };
 
+function fade(opacity) {
+   return function(t) {
+     lines.selectAll("line.country")
+         .filter(function(d) {
+           return d.iso != t.iso;
+         })
+       .transition()
+         .style("opacity", opacity);
+   };
+}
 
-function start() {
+function start(year) {
 
   lines.selectAll("line.country")
     .data(allCountries, function(d) {
@@ -161,9 +176,19 @@ function start() {
           return '#0099CC';
       })
       .attr('stroke-width', 4.2)
+      .on("mouseover", fade(.1))
+      .on("mouseout", fade(1))
       .on('click', function(sourceCountry) {
-          d3.json(HOST + COUNTRY_LINKS_URL.format(sourceCountry.iso), function(links) { 
+          console.log("click");
+          restoreCountries();
+          d3.json(HOST + COUNTRY_LINKS_URL.format(sourceCountry.iso, year), function(links) { 
             links = links.rows;
+            var max_sum = d3.max(links, function(a) { return a.sum});
+            var linksByIso = {};
+            for(var i = 0; i < links.length; ++i) {
+              linksByIso[links[i].from_iso] = links[i].sum;
+
+            }
 
             lines.selectAll('line.country')
               .filter(function(d, i) {
@@ -176,51 +201,65 @@ function start() {
               })
               .transition()
                 .attr('x2', function(d) {
-                    return 0.9*(settings.MAIN_BALL_RADIO)*Math.cos(angleFromIdx(d.idx));
+                    var f = 1.0 - 0.1*(linksByIso[d.iso]/max_sum);
+                    f = Math.max(0.9, f);
+                    return f*(settings.MAIN_BALL_RADIO)*Math.cos(angleFromIdx(d.idx));
                 })
                 .attr('y2', function(d) {
-                    return 0.9*(settings.MAIN_BALL_RADIO)*Math.sin(angleFromIdx(d.idx));
+                    var f = 1.0 - 0.1*(linksByIso[d.iso]/max_sum);
+                    f = Math.max(0.9, f);
+                    return f*(settings.MAIN_BALL_RADIO)*Math.sin(angleFromIdx(d.idx));
                 })
 
             lines.selectAll('path.link').remove()
             lines.selectAll('path.link')
-              .data(links)
+              .data(links.filter(function(d) {
+                return allCountriesByISO[d.from_iso] !== undefined;
+              }))
               .enter()
-              .append('path')
-              .attr('class', 'link')
-              .attr("d", function(d) {
-                var op = sourceCountry.position()
-                var tp = countryDataByIso[d.from_iso].position();
-                var s = "M " + op.x + "," + op.y;
-                var e = "C 0,0 0,0 " + tp.x +"," + tp.y;
-                return s + " " + e; //'M 0,420 C 110,220 220,145 0,0'
-              })
-              .attr('fill', 'none')
-              .attr('stroke', '#FFF')
-              .attr('stroke-width', 1)
+                .append('path')
+                .attr('class', 'link')
+                .attr("d", function(d) {
+                  var op = sourceCountry.position()
+                  var f = 1.0 - 0.1*(d.sum/max_sum);
+                  var tp = allCountriesByISO[d.from_iso].position(f*0.97);
+                  var s = "M " + op.x + "," + op.y;
+                  var e = "C 0,0 0,0 " + tp.x +"," + tp.y;
+                  return s + " " + e; //'M 0,420 C 110,220 220,145 0,0'
+                })
+                .attr('fill', 'none')
+                .attr('stroke', '#FFF')
+                .attr('stroke-width', function(d) {
+                  return 0.2 + 1.4*d.sum/max_sum;
+                })
+                .attr('opacity', function(d) {
+                  return 0.1 + 0.5*d.sum/max_sum;
+                });
           });
 
 
       });
 
-      lines.selectAll("line.country")
-        .data(allCountries)
-        .transition()
-          .attr('x2', function(d) {
-              var c = countryDataByIso[d.iso];
-              var v = 0;
-              if (c) {
-                v = c.value;
-              }
-              return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.cos(angleFromIdx(d.idx));
-          })
-          .attr('y2', function(d) {
-              var c = countryDataByIso[d.iso];
-              var v = 0;
-              if (c) {
-                v = c.value;
-              }
-              return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
-          })
+      var restoreCountries = function() {
+        lines.selectAll("line.country")
+          .data(allCountries)
+          .transition()
+            .attr('x2', function(d) {
+                var c = countryDataByIso[d.iso];
+                var v = 0;
+                if (c) {
+                  v = c.value;
+                }
+                return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.cos(angleFromIdx(d.idx));
+            })
+            .attr('y2', function(d) {
+                var c = countryDataByIso[d.iso];
+                var v = 0;
+                if (c) {
+                  v = c.value;
+                }
+                return (settings.MAIN_BALL_RADIO + v*settings.MAX_LINE_SIZE)*Math.sin(angleFromIdx(d.idx));
+            })
+      }
     }
 
