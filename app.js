@@ -82,10 +82,10 @@ document.getElementById('nextBtn').onclick = function() {
 
 function updateYear(y){
   document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
-  document.getElementById('nextBtn_a').style.display = (y<2009) ? 'inline' : 'none';
+  document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
   document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
   document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
-  document.getElementById('big_year').innerHTML = year == 2009?"all years":y.toString();
+  document.getElementById('big_year').innerHTML = y.toString();
 }
 
 
@@ -200,9 +200,6 @@ function show_year(year) {
   loading(false);
   removeAllLinks();
   var sql = HOST + THE_ANDREW_SQL.format(year);
-  if(year == 2009) {
-    var sql = HOST + THE_ANDREW_SQL_LOVE;
-  }
 
   d3.json(sql , function(data) {
       loading(true);
