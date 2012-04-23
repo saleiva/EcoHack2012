@@ -46,7 +46,6 @@ var allCountriesByISO = {};
 
 var c = 100;
 function angleFromIdx(i) {
-  //return -Math.PI/7 + (i-1)*2*Math.PI/allCountries.length;
   return -Math.PI/2 + (i-1)*2*Math.PI/allCountries.length;
 }
 
@@ -95,7 +94,6 @@ document.getElementById('filterList').onclick = function(e) {
    var eee = e.target.getAttribute('href');
    if(!eee) return;
    order_i = parseInt(e.target.getAttribute('href').slice(1), 10);
-   console.log(order_i);
    restart();
    var c = document.getElementById('filterList').children;
    for(var i = 0; i < c.length; ++i) {
