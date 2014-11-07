@@ -81,7 +81,7 @@ document.getElementById('nextBtn').onclick = function() {
 
 function updateYear(y){
   document.getElementById('prevBtn_a').style.display = (y>1975) ? 'inline' : 'none';
-  document.getElementById('nextBtn_a').style.display = (y<2008) ? 'inline' : 'none';
+  document.getElementById('nextBtn_a').style.display = (y<2013) ? 'inline' : 'none';
   document.getElementById('prevBtn_a').innerHTML = (y-1).toString();
   document.getElementById('nextBtn_a').innerHTML = (y+1).toString();
   document.getElementById('big_year').innerHTML = y.toString();
